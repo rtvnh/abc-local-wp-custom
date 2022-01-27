@@ -1,0 +1,43 @@
+{
+    "name": "rtvnh/abc-local-wp-custom",
+    "description": "WordPress Plugin to post new updates to the ABC Manager of NH/AT5",
+    "type": "wordpress-plugin",
+    "license": "GPL-2.0+",
+    "authors": [
+        {
+            "name": "NH Media",
+            "email": "info@nhmedia.nl",
+            "homepage": "https://nhmedia.nl",
+            "role": "Owner"
+        },
+        {
+            "name": "Angry Bytes BV",
+            "email": "info@angrybytes.com",
+            "homepage": "https://angrybytes.com",
+            "role": "Developer"
+        }
+    ],
+    "config": {
+        "sort-packages": true
+    },
+    "scripts": {
+        "phpcheck": [
+            "./vendor/bin/phpstan analyse --memory-limit=1G",
+            "./vendor/bin/parallel-lint --exclude vendor .",
+            "./vendor/bin/phpcs -p --standard=WordPress --ignore=/vendor ."
+        ],
+        "phpfix": [
+            "./vendor/bin/phpcbf -p --standard=WordPress --extensions=php --ignore=/vendor ."
+        ]
+    },
+    "minimum-stability": "stable",
+    "required": {
+        "php": "7.3.* || 7.4.* || 8.0.*"
+    },
+    "require-dev": {
+        "dealerdirect/phpcodesniffer-composer-installer": "0.7.*",
+        "php-parallel-lint/php-parallel-lint": "^1.3",
+        "szepeviktor/phpstan-wordpress": "0.7.*",
+        "wp-coding-standards/wpcs": "*"
+    }
+}
