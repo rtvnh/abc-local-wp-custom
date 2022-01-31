@@ -1,0 +1,9 @@
+#$ vendor/bin/phpstan analyze --memory-limit=1G
+
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+parameters:
+    level: max
+    paths:
+        - abc-local-partner-wp-plugin.php
+        - class-abclocalpartnerwp-updater.php
