@@ -8,14 +8,14 @@
  * that starts the plugin.
  *
  * @link              https://github.com/rtvnh/abc-local-wp-plugin
- * @since             0.4.0
+ * @since             0.1.0
  * @package           Plugin_ABC_Manager_Local_Partner
  *
  * @wordpress-plugin
  * Plugin Name:         ABC Manager - Custom Local Partner
  * Plugin URI:          https://github.com/rtvnh/abc-local-wp-plugin
  * Description:         WordPress Plugin to post new updates to the ABC Manager of NH/AT5
- * Version:             0.0.1
+ * Version:             0.1.0
  * Author:              AngryBytes B.V.
  * Author URI:          https://angrybytes.com
  * License:             GPL-2.0+
