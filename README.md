@@ -53,4 +53,4 @@ Do you have problems installing the plugin or experience errors in the syncing o
 ## Dutch documentation
 
 Voor de Nederlandse
-documentatie, [klikt u hier](https://github.com/rtvnh/abc-local-wp-plugin/blob/develop/docs/nl.md).
+documentatie, [klikt u hier](https://github.com/rtvnh/abc-local-wp-custom/blob/develop/docs/nl.md).

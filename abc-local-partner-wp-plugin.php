@@ -7,15 +7,15 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              https://github.com/rtvnh/abc-local-wp-plugin
+ * @link              https://github.com/rtvnh/abc-local-wp-custom
  * @since             0.1.0
  * @package           Plugin_ABC_Manager_Local_Partner
  *
  * @wordpress-plugin
  * Plugin Name:         ABC Manager - Custom Local Partner
- * Plugin URI:          https://github.com/rtvnh/abc-local-wp-plugin
+ * Plugin URI:          https://github.com/rtvnh/abc-local-wp-custom
  * Description:         WordPress Plugin to post new updates to the ABC Manager of NH/AT5
- * Version:             0.1.0
+ * Version:             0.1.1
  * Author:              AngryBytes B.V.
  * Author URI:          https://angrybytes.com
  * License:             GPL-2.0+
@@ -29,7 +29,7 @@ require_once plugin_dir_path( __FILE__ ) . '/class-abclocalpartnerwp-updater.php
 
 $updater = new AbcLocalPartnerWp_Updater( __FILE__ );
 $updater->set_username( 'rtvnh' );
-$updater->set_repository( 'abc-local-wp-plugin' );
+$updater->set_repository( 'abc-local-wp-custom' );
 $updater->initialize();
 
 $abc_post_status = false;
