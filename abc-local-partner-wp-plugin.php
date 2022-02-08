@@ -377,9 +377,9 @@ function post_article_to_abc_manager(
         INNER JOIN wp_toolset_connected_elements
         ON wp_postmeta.post_id = wp_toolset_connected_elements.element_id
         INNER JOIN wp_toolset_associations
-        ON wp_toolset_connected_elements.id = wp_toolset_associations.child_id
+        ON wp_toolset_connected_elements.group_id = wp_toolset_associations.child_id
         WHERE wp_toolset_associations.parent_id = (
-            SELECT id
+            SELECT group_id
             FROM wp_toolset_connected_elements
             WHERE wp_toolset_connected_elements.element_id = {$post->ID}
         )
