@@ -383,10 +383,14 @@ function post_article_to_abc_manager(
             FROM wp_toolset_connected_elements
             WHERE wp_toolset_connected_elements.element_id = {$post->ID}
         )
+        AND wp_toolset_associations.relationship_id = (
+            SELECT id
+            FROM wp_toolset_relationships
+            WHERE wp_toolset_relationships.slug = 'audio-item'
+        )
     ");
 
     if (count($podcastMeta) > 0) {
-        sleep(1);
         $podcastData = [];
 
         foreach ($podcastMeta as $meta) {
