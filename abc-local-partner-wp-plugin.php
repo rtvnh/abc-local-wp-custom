@@ -352,7 +352,12 @@ function check_abc_status(): bool {
  *
  * @return bool
  */
-function post_article_to_abc_manager( WP_Post $post, array $post_galleries, string $post_featured, int $attempts = 0 ): bool {
+function post_article_to_abc_manager(
+    WP_Post $post,
+    array $post_galleries,
+    string $post_featured,
+    int $attempts = 0
+): bool {
 	$galleries_json  = wp_json_encode( $post_galleries );
 	$api_endpoint    = get_option( 'abclocalpartner_option_abc_url' );
 	$partner_name    = get_option( 'abclocalpartner_option_partner_name' );
@@ -372,9 +377,9 @@ function post_article_to_abc_manager( WP_Post $post, array $post_galleries, stri
         INNER JOIN wp_toolset_connected_elements
         ON wp_postmeta.post_id = wp_toolset_connected_elements.element_id
         INNER JOIN wp_toolset_associations
-        ON wp_toolset_connected_elements.id = wp_toolset_associations.child_id
+        ON wp_toolset_connected_elements.group_id = wp_toolset_associations.child_id
         WHERE wp_toolset_associations.parent_id = (
-            SELECT id
+            SELECT group_id
             FROM wp_toolset_connected_elements
             WHERE wp_toolset_connected_elements.element_id = {$post->ID}
         )
@@ -464,54 +469,8 @@ function abclocalpartner_post_to_abc( WP_Post $post ): void {
 				$post_galleries,
 				$post_featured
 			);
-
-			// Only works for classic editor.
-			add_filter( 'redirect_post_location', 'add_notice_query_param', 99 );
 		}
 	}
-}
-
-/**
- * Add query param &abc=<status> to url after post, only works for classic editor.
- *
- * @param string $location Location from WordPress.
- * @return string
- */
-function add_notice_query_param( $location ): string {
-	global $abc_post_status;
-
-	remove_filter( 'redirect_post_location', 'add_notice_query_param', 99 );
-
-	return add_query_arg(
-		array(
-			'abc'       => $abc_post_status,
-			'abc_nonce' => wp_create_nonce( 'abc-nonce' ),
-		),
-		$location
-	);
-}
-
-/**
- * Add notice after post, only works for classic editor.
- */
-function add_abc_notice_after_post_save(): void {
-	$abc_status = null;
-
-	if ( isset( $_GET['abc'] ) &&
-		isset( $_GET['abc_nonce'] ) &&
-		wp_verify_nonce( sanitize_key( wp_unslash( $_GET['abc_nonce'] ) ), 'abc-nonce' )
-	) {
-		$abc_status = sanitize_key( wp_unslash( $_GET['abc'] ) );
-	}
-
-	if ( null === $abc_status ) {
-		return;
-	}
-	?>
-	<div class="notice notice-<?php echo $abc_status ? 'success' : 'error'; ?> is-dismissible">
-		<p>Het versturen van het bericht naar ABC Manager is <?php echo $abc_status ? 'gelukt' : 'mislukt'; ?>.</p>
-	</div>
-	<?php
 }
 
 /**
@@ -529,26 +488,7 @@ function gutenberg_post_to_abc( WP_Post $post ): void {
 	abclocalpartner_post_to_abc( $post );
 }
 
-/**
- * Triggers only on classic save calls
- *
- * @param   int     $post_id WordPress Post ID.
- * @param   WP_Post $post    WordPress Post.
- */
-function classic_post_to_abc( int $post_id, WP_Post $post ): void {
-	// Prevent save calls from gutenberg, because they are using another hook.
-	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-		return;
-	}
-
-	abclocalpartner_post_to_abc( $post );
-}
-
 add_action( 'rest_after_insert_post', 'gutenberg_post_to_abc', 10, 1 );
-add_action( 'save_post', 'classic_post_to_abc', 10, 2 );
-
-
-add_action( 'admin_notices', 'add_abc_notice_after_post_save' );
 
 /**
  * Allow iframe HTML tags.
@@ -571,3 +511,36 @@ function prefix_add_source_tag( array $tags, string $context ): array {
 }
 
 add_filter( 'wp_kses_allowed_html', 'prefix_add_source_tag', 10, 2 );
+
+/**
+ * Add custom meta values for posts from ABC manager
+ *
+ * @param $response
+ * @param $object
+ * @param $request
+ * @return mixed
+ */
+function default_meta_from_abc_post( $response, $object, $request) {
+    if (
+        isset($response[ 'type' ]) &&
+        $response[ 'type' ] === 'post' &&
+        defined( 'REST_REQUEST' ) &&
+        REST_REQUEST &&
+        isset( $_GET[ 'abc' ] )
+    ) {
+        $post_id = $response[ 'id' ];
+        // Add citation to featured image
+        if (isset($_GET[ 'imageCitation' ])) {
+            update_post_meta($post_id, 'wpcf-bronvermelding-foto', $_GET[ 'imageCitation' ]);
+        }
+
+        // New post, set wpcf-laat-artikel-niet-zien-op-voorpagina to false
+        if ($request->get_route() === '/wp/v2/posts') {
+            update_post_meta($post_id, 'wpcf-laat-artikel-niet-zien-op-voorpagina', 0);
+        }
+    }
+
+    return $response;
+}
+
+add_filter( 'rest_pre_echo_response', 'default_meta_from_abc_post', 10, 3 );
