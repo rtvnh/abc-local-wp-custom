@@ -15,7 +15,7 @@
  * Plugin Name:         ABC Manager - Custom Local Partner
  * Plugin URI:          https://github.com/rtvnh/abc-local-wp-custom
  * Description:         WordPress Plugin to post new updates to the ABC Manager of NH/AT5
- * Version:             0.1.5
+ * Version:             0.1.6
  * Author:              AngryBytes B.V.
  * Author URI:          https://angrybytes.com
  * License:             GPL-2.0+
@@ -482,17 +482,19 @@ function abclocalpartner_post_to_abc( WP_Post $post ): void {
  *
  * @param   WP_Post $post WordPress post.
  */
-function gutenberg_post_to_abc( WP_Post $post ): void {
+function gutenberg_post_to_abc( int $metaId, int $postId ): void {
 	// Prevent save calls from ABC Manager to be also send to ABC Manager back again.
     // phpcs:ignore
 	if ( defined( 'REST_REQUEST' ) && REST_REQUEST && isset( $_GET['abc'] ) ) {
 		return;
 	}
 
+	$post = get_post( $postId );
+
 	abclocalpartner_post_to_abc( $post );
 }
 
-add_action( 'rest_after_insert_post', 'gutenberg_post_to_abc', 10, 1 );
+add_action( 'added_post_meta', 'gutenberg_post_to_abc', 10, 2 );
 
 /**
  * Allow iframe HTML tags.
