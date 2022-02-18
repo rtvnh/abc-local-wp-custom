@@ -15,7 +15,7 @@
  * Plugin Name:         ABC Manager - Custom Local Partner
  * Plugin URI:          https://github.com/rtvnh/abc-local-wp-custom
  * Description:         WordPress Plugin to post new updates to the ABC Manager of NH/AT5
- * Version:             0.1.7
+ * Version:             0.1.8
  * Author:              AngryBytes B.V.
  * Author URI:          https://angrybytes.com
  * License:             GPL-2.0+
@@ -542,7 +542,7 @@ function default_meta_from_abc_post( $response, $object, $request) {
 
         // New post, set wpcf-laat-artikel-niet-zien-op-voorpagina to false
         if ($request->get_route() === '/wp/v2/posts') {
-            update_post_meta($post_id, 'wpcf-laat-artikel-niet-zien-op-voorpagina', 0);
+            update_post_meta($post_id, 'wpcf-laat-artikel-zien-op-voorpagina', 0);
         }
     }
 
