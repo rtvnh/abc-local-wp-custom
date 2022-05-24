@@ -371,6 +371,13 @@ function post_article_to_abc_manager(
 
     global $wpdb;
 
+    $postMeta = get_post_meta($post->ID);
+
+    // Prevent duplicate posts to abc for new articles
+    if (!isset($postMeta['_edit_last'])) {
+        return false;
+    }
+
     $videoEmbedCodes = $wpdb->get_results("
         SELECT meta_value
         FROM wp_postmeta
@@ -499,19 +506,17 @@ function abclocalpartner_post_to_abc( WP_Post $post ): void {
  *
  * @param   WP_Post $post WordPress post.
  */
-function gutenberg_post_to_abc( int $metaId, int $postId ): void {
+function gutenberg_post_to_abc(int $postId, WP_Post $post, $update ): void {
 	// Prevent save calls from ABC Manager to be also send to ABC Manager back again.
     // phpcs:ignore
 	if ( defined( 'REST_REQUEST' ) && REST_REQUEST && isset( $_GET['abc'] ) ) {
 		return;
 	}
 
-	$post = get_post( $postId );
-
 	abclocalpartner_post_to_abc( $post );
 }
 
-add_action( 'added_post_meta', 'gutenberg_post_to_abc', 10, 2 );
+add_action( 'wp_insert_post', 'gutenberg_post_to_abc', 10, 3 );
 
 /**
  * Allow iframe HTML tags.
