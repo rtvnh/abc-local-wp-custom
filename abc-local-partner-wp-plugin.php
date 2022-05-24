@@ -506,7 +506,7 @@ function abclocalpartner_post_to_abc( WP_Post $post ): void {
  *
  * @param   WP_Post $post WordPress post.
  */
-function gutenberg_post_to_abc(int $postId, WP_Post $post, $update ): void {
+function gutenberg_post_to_abc( int $postId, WP_Post $post, bool $update ): void {
 	// Prevent save calls from ABC Manager to be also send to ABC Manager back again.
     // phpcs:ignore
 	if ( defined( 'REST_REQUEST' ) && REST_REQUEST && isset( $_GET['abc'] ) ) {
