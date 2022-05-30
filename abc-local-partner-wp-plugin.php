@@ -15,7 +15,7 @@
  * Plugin Name:         ABC Manager - Custom Local Partner
  * Plugin URI:          https://github.com/rtvnh/abc-local-wp-custom
  * Description:         WordPress Plugin to post new updates to the ABC Manager of NH/AT5
- * Version:             0.1.8
+ * Version:             0.1.9
  * Author:              AngryBytes B.V.
  * Author URI:          https://angrybytes.com
  * License:             GPL-2.0+
@@ -371,6 +371,30 @@ function post_article_to_abc_manager(
 
     global $wpdb;
 
+    $postMeta = get_post_meta($post->ID);
+
+    // Prevent duplicate posts to abc for new articles
+    if (!isset($postMeta['_edit_last'])) {
+        return false;
+    }
+
+    $videoEmbedCodes = $wpdb->get_results("
+        SELECT meta_value
+        FROM wp_postmeta
+        WHERE wp_postmeta.post_id = {$post->ID}
+        AND wp_postmeta.meta_key = 'wpcf-video-embedcode'
+    ");
+
+    if (count($videoEmbedCodes) > 0) {
+        foreach ($videoEmbedCodes as $videoEmbedCode) {
+            // Add the content as custom html.
+            $post->post_content .= "<!-- wp:custom-html -->
+                $videoEmbedCode->meta_value
+                <!-- /wp:custom-html -->
+            ";
+        }
+    }
+
     $podcastMeta = $wpdb->get_results("
         SELECT post_id, meta_key, meta_value
         FROM wp_postmeta
@@ -482,19 +506,17 @@ function abclocalpartner_post_to_abc( WP_Post $post ): void {
  *
  * @param   WP_Post $post WordPress post.
  */
-function gutenberg_post_to_abc( int $metaId, int $postId ): void {
+function gutenberg_post_to_abc( int $postId, WP_Post $post, bool $update ): void {
 	// Prevent save calls from ABC Manager to be also send to ABC Manager back again.
     // phpcs:ignore
 	if ( defined( 'REST_REQUEST' ) && REST_REQUEST && isset( $_GET['abc'] ) ) {
 		return;
 	}
 
-	$post = get_post( $postId );
-
 	abclocalpartner_post_to_abc( $post );
 }
 
-add_action( 'added_post_meta', 'gutenberg_post_to_abc', 10, 2 );
+add_action( 'wp_insert_post', 'gutenberg_post_to_abc', 10, 3 );
 
 /**
  * Allow iframe HTML tags.
