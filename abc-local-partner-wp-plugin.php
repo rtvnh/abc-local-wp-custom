@@ -439,6 +439,9 @@ function post_article_to_abc_manager(
         }
     }
 
+    // Add author name to post content
+    $post->author_name = get_the_author_meta('display_name', $post->post_author);
+
 	$response = wp_remote_post(
 		$api_endpoint . '/partner/article',
 		array(
