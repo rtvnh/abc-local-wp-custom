@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.1.13
+* Send articles that are planned for the future to ABC manager
+
 ## 0.1.12
 * Add author name to the post content
 
